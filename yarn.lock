@@ -17899,9 +17899,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-auth@npm:4.22.3":
-  version: 4.22.3
-  resolution: "next-auth@npm:4.22.3"
+"next-auth@npm:4.24.5":
+  version: 4.24.5
+  resolution: "next-auth@npm:4.24.5"
   dependencies:
     "@babel/runtime": "npm:^7.20.13"
     "@panva/hkdf": "npm:^1.0.2"
@@ -17913,14 +17913,14 @@ __metadata:
     preact-render-to-string: "npm:^5.1.19"
     uuid: "npm:^8.3.2"
   peerDependencies:
-    next: ^12.2.5 || ^13
+    next: ^12.2.5 || ^13 || ^14
     nodemailer: ^6.6.5
     react: ^17.0.2 || ^18
     react-dom: ^17.0.2 || ^18
   peerDependenciesMeta:
     nodemailer:
       optional: true
-  checksum: 8efce231d90e7192faa7648af6fe7a45cfb2d9e3bf13c7c280b4c913416c5990676bcb10d83b74e78486e41213add433c30c1801f5eb9cdb458451e4e7b4aa20
+  checksum: c9256deaa7a77741be2c8829c290c43c63fd8fa86ace3196910d3fa4389c101d6a610f3c5f4b55000e766a51dd89eafc9b5cd876e373884db3bf90122fdfa6a1
   languageName: node
   linkType: hard
 
@@ -18104,7 +18104,7 @@ __metadata:
     jose: "npm:4.14.4"
     ky: "npm:0.33.3"
     next: "npm:13.4.12"
-    next-auth: "npm:4.22.3"
+    next-auth: "npm:4.24.5"
     next-connect: "npm:1.0.0"
     next-i18next: "npm:14.0.0"
     next-secure-headers: "npm:2.2.0"
