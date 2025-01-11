@@ -9,6 +9,7 @@ const {
 
 module.exports = {
   root: true,
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
     project: 'tsconfig.json',
@@ -16,6 +17,7 @@ module.exports = {
   ignorePatterns: [...getDefaultIgnorePatterns()],
   extends: [
     '@your-org/eslint-config-bases/typescript',
+    '@your-org/eslint-config-bases/import-x',
     // Apply prettier and disable incompatible rules
     '@your-org/eslint-config-bases/prettier-plugin',
   ],

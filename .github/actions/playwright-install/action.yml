@@ -21,7 +21,7 @@ runs:
       id: playwright-config
       shell: bash
       run: |
-        echo "CURRENT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
+        echo "CURRENT_VERSION=$(npm ls @playwright/test | grep '@playwright/test@' | grep -v 'deduped' |  sed 's/.*@//' | uniq -u)" >> $GITHUB_OUTPUT
         RAW_BROWSERS="${{ inputs.browsers }}"
         BROWSERS=$(echo $RAW_BROWSERS | sed -r 's/[[:space:]]+/+/g')
         echo "BROWSERS=$BROWSERS" >> $GITHUB_OUTPUT
@@ -33,7 +33,7 @@ runs:
         echo "CACHE_KEY=${{ runner.os }}-playwright-cache-${{ inputs.cache-prefix }}-${{ steps.playwright-config.outputs.CURRENT_VERSION }}-${{ steps.playwright-config.outputs.BROWSERS }}" >> $GITHUB_OUTPUT
 
     - name: ♻️ Restore playwright install
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: playwright-cache
       with:
         path: ${{ inputs.playwright-cache-folder }}

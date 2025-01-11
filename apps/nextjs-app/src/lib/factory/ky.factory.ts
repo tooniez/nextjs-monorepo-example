@@ -1,5 +1,4 @@
-import Ky from 'ky';
-import type { Options, NormalizedOptions } from 'ky';
+import Ky, { type Options, type NormalizedOptions } from 'ky';
 
 type Props = {
   baseUrl?: string;
@@ -7,15 +6,16 @@ type Props = {
     request: Request,
     options: NormalizedOptions,
     response: Response
-  ) => void;
+  ) => Promise<void>;
 };
 
 export class KyFactory {
   constructor(private props: Props) {}
   create = (options?: Omit<Options, 'hooks'>): typeof Ky => {
     const hooks: Options['hooks'] =
-      this.props.onAuthFailure !== undefined
-        ? {
+      this.props.onAuthFailure === undefined
+        ? {}
+        : {
             afterResponse: [
               async (request, options, response): Promise<Response> => {
                 const { status } = response;
@@ -23,13 +23,12 @@ export class KyFactory {
                   [401, 403].includes(status) &&
                   this.props.onAuthFailure !== undefined
                 ) {
-                  this.props.onAuthFailure(request, options, response);
+                  await this.props.onAuthFailure(request, options, response);
                 }
                 return response;
               },
             ],
-          }
-        : {};
+          };
 
     return Ky.create({
       prefixUrl: this.props.baseUrl,

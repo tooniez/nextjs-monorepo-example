@@ -15,8 +15,19 @@
       "@your-org/core-lib/*": ["../../../packages/core-lib/src/*"],
       "@your-org/core-lib": ["../../../packages/core-lib/src/index"],
       "@your-org/ts-utils": ["../../../packages/ts-utils/src/index"]
-    }
+    },
+    "types": ["@testing-library/jest-dom/vitest"]
   },
-  "exclude": ["**/node_modules", "**/.*/", "dist"],
-  "include": ["**/*.js", "**/*.ts", "**/*.tsx"]
+  "exclude": ["**/node_modules", "**/.*/*"],
+  "include": [
+    ".eslintrc.*",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts",
+    "**/*.js",
+    "**/*.cjs",
+    "**/*.mjs",
+    "**/*.jsx",
+    "**/*.json"
+  ]
 }

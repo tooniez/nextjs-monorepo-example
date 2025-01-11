@@ -1,6 +1,12 @@
 import createEmotionServer from '@emotion/server/create-instance';
-import type { DocumentProps } from 'next/document';
-import Document, { Html, Main, Head, NextScript } from 'next/document';
+import {
+  default as Document,
+  type DocumentProps,
+  Html,
+  Main,
+  Head,
+  NextScript,
+} from 'next/document';
 import { createEmotionCache } from '@/lib/emotion';
 import { defaultLocale } from '../../next-i18next.config.mjs';
 
@@ -67,6 +73,7 @@ MyDocument.getInitialProps = async (ctx) => {
   // You can consider sharing the same Emotion cache between all the SSR requests to speed up performance.
   // However, be aware that it can have global side effects.
   const cache = createEmotionCache();
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const { extractCriticalToChunks } = createEmotionServer(cache);
 
   ctx.renderPage = () =>
@@ -99,12 +106,12 @@ MyDocument.getInitialProps = async (ctx) => {
 if (process.env.NEXT_MANUAL_SIG_HANDLE) {
   // this should be added in your custom _document
   process.on('SIGTERM', () => {
-    console.log('Received SIGTERM: ', 'cleaning up');
+    console.log('Received SIGTERM:', 'cleaning up');
     process.exit(0);
   });
 
   process.on('SIGINT', () => {
-    console.log('Received SIGINT: ', 'cleaning up');
+    console.log('Received SIGINT:', 'cleaning up');
     process.exit(0);
   });
 }

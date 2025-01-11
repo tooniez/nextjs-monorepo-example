@@ -1,11 +1,10 @@
 import type { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import { default as CredentialsProvider } from 'next-auth/providers/credentials';
 import { createHttpUnauthorized } from '@/lib/auth/error';
 import { getServerRuntimeEnv } from './server-runtime-env.config.mjs';
 
 const serverRuntimeEnv = getServerRuntimeEnv();
-
-const oneDayInSeconds = 86400;
+const oneDayInSeconds = 86_400;
 
 /**
  * @todo Remove this once oauth is ready
@@ -104,7 +103,7 @@ export const nextAuthConfig: NextAuthOptions = {
         ...session,
         user: {
           ...session.user,
-          role: token.role as string,
+          role: token.role,
         },
       };
     },

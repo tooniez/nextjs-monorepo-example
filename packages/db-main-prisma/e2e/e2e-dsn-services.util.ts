@@ -1,9 +1,8 @@
-import { parseDsn } from '@soluble/dsn-parser';
-import type { ParsedDsn } from '@soluble/dsn-parser';
+import { parseDsn, type ParsedDsn } from '@soluble/dsn-parser';
 import isPortReachable from 'is-port-reachable';
 import pc from 'picocolors';
 
-const dsn = process.env.E2E_PRISMA_DATABASE_URL as string;
+const dsn = process.env.E2E_PRISMA_DATABASE_URL!;
 
 export const getValidatedDsn = (): { dsn: string } & ParsedDsn => {
   const parsedDsn = parseDsn(dsn);
@@ -27,7 +26,7 @@ export const getAndCheckDatabaseDsn = async (): Promise<string> => {
   const { dsn, port, host } = getValidatedDsn();
   const reachable = await isPortReachable(port as unknown as number, {
     host: host,
-    timeout: 5_000,
+    timeout: 5000,
   });
 
   if (!reachable) {
