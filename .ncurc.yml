@@ -3,4 +3,5 @@
 # @link https://github.com/raineorshine/npm-check-updates
 
 # Add here exclusions on packages if any
-reject: ['@typescript-eslint/eslint-plugin', '@typescript-eslint/parser']
+reject:
+  ['eslint', '@pothos/plugin-prisma', '@pothos/core', '@pothos/plugin-errors']

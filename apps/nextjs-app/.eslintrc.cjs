@@ -12,13 +12,15 @@ const {
 
 module.exports = {
   root: true,
+  parser: '@typescript-eslint/parser',
   parserOptions: {
+    projectService: true,
     tsconfigRootDir: __dirname,
-    project: 'tsconfig.json',
   },
   ignorePatterns: [...getDefaultIgnorePatterns(), '.next', '.out'],
   extends: [
     '@your-org/eslint-config-bases/typescript',
+    '@your-org/eslint-config-bases/import-x',
     '@your-org/eslint-config-bases/sonar',
     '@your-org/eslint-config-bases/regexp',
     '@your-org/eslint-config-bases/jest',
@@ -54,7 +56,7 @@ module.exports = {
       },
     },
     {
-      files: ['src/pages/\\_*.{ts,tsx}'],
+      files: [String.raw`src/pages/\_*.{ts,tsx}`],
       rules: {
         'react/display-name': 'off',
       },

@@ -1,4 +1,4 @@
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
@@ -11,6 +11,7 @@ export default defineConfig({
       // fastRefresh: false,
     }),
   ],
+  cacheDir: '../../.cache/vitest/ui-lib',
   test: {
     globals: true,
     environment: 'happy-dom',
@@ -22,9 +23,6 @@ export default defineConfig({
         enabled: true,
       },
     }, */
-    cache: {
-      dir: '../../.cache/vitest/ui-lib',
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'clover'],

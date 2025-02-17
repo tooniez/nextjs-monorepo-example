@@ -36,7 +36,7 @@ describe('getBuildEnv', () => {
     });
     expect(
       (buildEnv as unknown as typeof injectedEnv).NEXT_BUILD_ENV_OUTPUT
-    ).toStrictEqual('classic');
+    ).toBe('classic');
   });
 
   describe('boolean coercion', () => {
@@ -45,7 +45,7 @@ describe('getBuildEnv', () => {
       ['1', true],
       ['false', false],
       ['0', false],
-    ])('when "%p" is given should return "%b"', (truthyValue, expected) => {
+    ])('when "%s" is given should return "%s"', (truthyValue, expected) => {
       const zodSchema = createExampleSchema({ defaultOutput: 'classic' });
       const injectedEnv = {
         NEXT_BUILD_ENV_LINT: truthyValue,

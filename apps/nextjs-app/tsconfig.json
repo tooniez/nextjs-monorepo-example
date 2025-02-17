@@ -18,7 +18,7 @@
       "@/config/*": ["./config/*"],
       "@/lib/*": ["./lib/*"],
       "@/components/*": ["./components/*"],
-      "@/backend/*": ["./backend/*"],
+      "@/server/*": ["./server/*"],
       "@/features/*": ["./features/*"],
       "@/layouts/*": ["./layouts/*"],
       "@/pages/*": ["./pages/*"],
@@ -28,7 +28,6 @@
       "@your-org/common-i18n/locales/*": [
         "../../../packages/common-i18n/src/locales/*"
       ],
-      "@your-org/api-gateway": ["../../../packages/api-gateway/src/index"],
       "@your-org/ui-lib/*": ["../../../packages/ui-lib/src/*"],
       "@your-org/ui-lib": ["../../../packages/ui-lib/src/index"],
       "@your-org/core-lib/*": ["../../../packages/core-lib/src/*"],
@@ -38,10 +37,11 @@
       ],
       "@your-org/ts-utils": ["../../../packages/ts-utils/src/index"]
     },
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "@testing-library/jest-dom/vitest"]
   },
-  "exclude": ["**/node_modules", "**/.*/"],
+  "exclude": ["**/node_modules", "**/.*/*"],
   "include": [
+    ".eslintrc.*",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
@@ -50,6 +50,7 @@
     "**/*.cjs",
     "**/*.mjs",
     "**/*.jsx",
-    "**/*.json"
+    "**/*.json",
+    ".next/types/**/*.ts"
   ]
 }

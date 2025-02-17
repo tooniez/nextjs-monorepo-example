@@ -1,35 +1,61 @@
-import react from '@vitejs/plugin-react';
-import svgr from 'vite-plugin-svgr';
+import react from '@vitejs/plugin-react-swc';
+import magicalSvg from 'vite-plugin-magical-svg';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
-
 const testFiles = ['./src/**/*.test.{js,jsx,ts,tsx}'];
 
 export default defineConfig({
   plugins: [
     react({
+      devTarget: 'es2022',
       jsxImportSource: '@emotion/react',
-      babel: {
-        plugins: ['@emotion/babel-plugin'],
-      },
     }),
     tsconfigPaths(),
-    svgr({
-      // Set it to `true` to export React component as default.
-      // Notice that it will override the default behavior of Vite.
-      exportAsDefault: true,
-      // svgr options: https://react-svgr.com/docs/options/
-      svgrOptions: {},
+    magicalSvg({
+      target: 'react',
+      svgo: false,
     }),
   ],
+  cacheDir: '../../.cache/vitest/nextjs-app',
   test: {
     globals: true,
-    environment: 'happy-dom',
+    deps: {
+      optimizer: {
+        web: {
+          enabled: true,
+        },
+        ssr: { enabled: true },
+      },
+    },
+    typecheck: {
+      enabled: false,
+    },
+    // threads is good, vmThreads is faster (perf++) but comes with possible memory leaks
+    // @link https://vitest.dev/config/#vmthreads
+    pool: 'forks',
+    poolOptions: {
+      vmThreads: {
+        // useAtomics -> perf+
+        // @link https://vitest.dev/config/#pooloptions-threads-useatomics
+        useAtomics: true,
+      },
+      threads: {
+        // minThreads: 4,
+        // maxThreads: 16,
+        // useAtomics -> perf+
+        // @link https://vitest.dev/config/#pooloptions-threads-useatomics
+        useAtomics: true,
+        // isolate to false makes perf++ but comes with limitations
+        // @link https://vitest.dev/config/#pooloptions-threads-isolate
+        isolate: true,
+      },
+    },
+    environmentMatchGlobs: [
+      ['**/*.ts', 'node'],
+      ['**/*.tsx', 'happy-dom'],
+    ],
     passWithNoTests: false,
     setupFiles: './config/tests/setupVitest.ts',
-    cache: {
-      dir: '../../.cache/vitest/nextjs-app',
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'clover'],
@@ -38,7 +64,7 @@ export default defineConfig({
     include: testFiles,
     // you might want to disable it, if you don't have tests that rely on CSS
     // since parsing CSS is slow
-    css: true,
+    // css: true,
     // To mimic Jest behaviour regarding mocks.
     // @link https://vitest.dev/config/#clearmocks
     clearMocks: true,

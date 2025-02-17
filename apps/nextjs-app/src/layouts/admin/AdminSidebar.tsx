@@ -3,12 +3,12 @@ import type { FC } from 'react';
 import { TextAvatar } from '@/components/avatar/TextAvatar';
 
 export const AdminSidebar: FC = () => {
-  // @todo better to use middleware or https://next-auth.js.org/getting-started/client#custom-client-session-handling
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const user = session?.user;
   return (
     <div className="flex flex-row sm:gap-10">
-      <div className="sm:w-full sm:max-w-[18rem]">
+      <div className="sm:w-full sm:max-w-72">
         <input
           type="checkbox"
           id="sidebar-mobile-fixed"
@@ -50,7 +50,7 @@ export const AdminSidebar: FC = () => {
                   <li className="menu-item">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 opacity-75"
+                      className="size-5 opacity-75"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -70,10 +70,10 @@ export const AdminSidebar: FC = () => {
                     <span>General</span>
                   </li>
 
-                  <li className="menu-active menu-item">
+                  <li className="menu-item menu-active">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 opacity-75"
+                      className="size-5 opacity-75"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -90,7 +90,7 @@ export const AdminSidebar: FC = () => {
                   <li className="menu-item">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 opacity-75"
+                      className="size-5 opacity-75"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -117,7 +117,7 @@ export const AdminSidebar: FC = () => {
                       <div className="flex gap-2">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 opacity-75"
+                          className="size-5 opacity-75"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -135,7 +135,7 @@ export const AdminSidebar: FC = () => {
                       <span className="menu-icon">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
+                          className="size-5"
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >
@@ -290,7 +290,7 @@ export const AdminSidebar: FC = () => {
                       <span className="menu-icon">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
+                          className="size-5"
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >
@@ -326,9 +326,9 @@ export const AdminSidebar: FC = () => {
               <label className="whites mx-2 flex h-fit w-full cursor-pointer p-0 hover:bg-gray-4">
                 <div className="flex flex-row gap-4 p-4">
                   <div className="avatar-square avatar avatar-md">
-                    {user !== undefined ? (
+                    {user === undefined ? null : (
                       <TextAvatar name={user.name ?? 'Demo User'} />
-                    ) : null}
+                    )}
                     {/* <img src={user?.image ?? } alt="avatar" /> */}
                   </div>
 

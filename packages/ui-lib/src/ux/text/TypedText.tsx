@@ -1,5 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import type { HTMLAttributes, FC } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type HTMLAttributes,
+  type FC,
+} from 'react';
 
 type TypedTextProps = {
   /** Animation speed in milliseconds */
@@ -19,13 +24,13 @@ export const TypedText: FC<TypedTextProps> = (props) => {
 
   const interval = useRef<number | null | undefined>();
   useEffect(() => {
-    interval.current = window.setInterval(() => {
+    interval.current = globalThis.window.setInterval(() => {
       // console.log('running interval');
       setCurrIdx((currIdx) => {
         if (currIdx > text.length) {
           if (interval.current) {
             setText(text === 'Typescript' ? children : 'Typescript');
-            window.clearInterval(interval.current);
+            globalThis.window.clearInterval(interval.current);
             interval.current = null;
           }
           return 0;
@@ -36,7 +41,7 @@ export const TypedText: FC<TypedTextProps> = (props) => {
     return () => {
       if (interval.current) {
         setCurrIdx(0);
-        window.clearInterval(interval.current);
+        globalThis.window.clearInterval(interval.current);
         interval.current = null;
       }
     };

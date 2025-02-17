@@ -3,15 +3,24 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": "./src",
-    "target": "ESNext",
+    "target": "esnext",
     "lib": ["esnext"],
-    "module": "ES2020",
+    "module": "esnext",
     "noEmit": false,
     "incremental": true,
-    "paths": {
-      "@your-org/core-lib/*": ["../../../packages/core-lib/src/*"],
-      "@your-org/core-lib": ["../../../packages/core-lib/src/index"]
-    }
+    "paths": {},
+    "types": ["vitest/globals"]
   },
-  "exclude": ["**/node_modules", "**/.*/", "dist", "build"]
+  "exclude": ["**/node_modules", "**/.*/*", "dist"],
+  "include": [
+    ".eslintrc.*",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts",
+    "**/*.js",
+    "**/*.cjs",
+    "**/*.mjs",
+    "**/*.jsx",
+    "**/*.json"
+  ]
 }

@@ -29,8 +29,8 @@
   </a>
 </p>
 
-> Howtos for monorepo. New to monorepos ? [check this FAQ](./README.md#monorepo). This example is managed by [Yarn 3.2+](https://dev.to/arcanis/yarn-32-libc-yarn-explain-next-major--o22)
-> / [typescript path aliases](https://www.typescriptlang.org/tsconfig#paths). Not the only way to do.
+> Howtos for monorepo. New to monorepos ? [check this FAQ](./README.md#monorepo). This example is managed by turborepo and yarn 4 with a
+> / [typescript path aliases](https://www.typescriptlang.org/tsconfig#paths) approach. Not the only way to do.
 
 Useful to
 
@@ -40,9 +40,9 @@ Useful to
 - Clarify some **advantages** of monorepos (team cohesion, consistency, duplication, refactorings, atomic commits...).
 - Create nextjs/vercel/prisma... bug reports with **reproducible examples** _(initial goal of this repo)_.
 
-## Sponsors :heart:
+## Sponsors ❤️
 
-If you are enjoying some this guide in your company, I'd really appreciate a [sponsorship](https://github.com/sponsors/belgattitude), a [coffee](https://ko-fi.com/belgattitude) or a dropped star.
+If you are enjoying some of my OSS work in your company, I'd really appreciate a [sponsorship](https://github.com/sponsors/belgattitude), a [coffee](https://ko-fi.com/belgattitude) or a dropped star.
 That gives me some more time to improve it to the next level.
 
 ### Special thanks to
@@ -93,10 +93,8 @@ yarn install
 .
 ├── apps
 │   ├── nextjs-app  (i18n, ssr, api, vitest)
-│   ├── remix-app   (csr, ssr, api, jest)
 │   └── vite-app
 └── packages
-    ├── api-gateway         (graphql mesh)
     ├── common-i18n         (locales...)
     ├── core-lib
     ├── db-main-prisma
@@ -107,7 +105,6 @@ yarn install
 #### Example apps
 
 - [apps/nextjs-app](./apps/nextjs-app): SSR, i18n, tailwind v3, emotion, graphQL, rest... [README](./apps/nextjs-app/README.md) | [DEMO/Vercel](https://monorepo-nextjs-app.vercel.app) | [CHANGELOG](./apps/nextjs-app/CHANGELOG.md)
-- [apps/remix-app](./apps/remix-app): Remix. [README](./apps/remix-app/README.md) | [~~DEMO/Vercel~~] | [CHANGELOG](./apps/remix-app/CHANGELOG.md)
 - [apps/vite-app](./apps/vite-app): Basic vite-app. [README](./apps/vite-app/README.md) | [DEMO/Vercel](https://monorepo-vite-app.vercel.app) | [CHANGELOG](./apps/vite-app/CHANGELOG.md)
 
 > Apps should not depend on apps, they can depend on packages
@@ -119,15 +116,8 @@ yarn install
 - [packages/eslint-config-bases](./packages/eslint-config-bases): [README](./packages/eslint-config-bases/README.md) | [CHANGELOG](./packages/eslint-config-bases/CHANGELOG.md)
 - [packages/ui-lib](./packages/ui-lib): publishable. [README](./packages/ui-lib/README.md) | [CHANGELOG](./packages/ui-lib/CHANGELOG.md)
 - [packages/common-i18n](./packages/common-i18n): [README](./packages/common-i18n/README.md) | [CHANGELOG](./packages/common-i18n/CHANGELOG.md)
-- [packages/api-gateway](./packages/api-gateway): [README](./packages/api-gateway/README.md) | [CHANGELOG](./packages/api-gateway/CHANGELOG.md)
 
 > Apps can depend on packages, packages can depend on each others...
-
-#### Shared static assets
-
-If needed static resources like **images**,... can be shared by using symlinks in the repo.
-
-- See the global [static](./static) folder.
 
 #### Folder overview
 
@@ -137,11 +127,6 @@ If needed static resources like **images**,... can be shared by using symlinks i
 ```
 .
 ├── apps
-│   ├── remix-app                (Remix.run app as an example)
-│   │   ├── app/
-│   │   ├── package.json         (define package workspace:package deps)
-│   │   └── tsconfig.json        (define path to packages)
-│   │
 │   ├── vite-app                 (Vite app as an example)
 │   │   ├── src/
 │   │   ├── package.json         (define package workspace:package deps)
@@ -150,8 +135,6 @@ If needed static resources like **images**,... can be shared by using symlinks i
 │   └── nextjs-app                  (NextJS app with api-routes)
 │       ├── e2e/                 (E2E tests with playwright)
 │       ├── public/
-│       │   ├── shared-assets/   (possible symlink to global assets)
-│       │   └── shared-locales/  (possible symlink to global locales)
 │       ├── src/
 │       │   └── pages/api        (api routes)
 │       ├── CHANGELOG.md
@@ -190,11 +173,12 @@ If needed static resources like **images**,... can be shared by using symlinks i
 ├── static                       (no code: images, json, locales,...)
 │   ├── assets
 │   └── locales
+├── docker                       (docker...)
+│   ├── .dockerignore
+│   ├── docker-compose.yml       (compose specific for nextjs-app)
+│   ├── docker-compose.db.yml    (general services like postgresql...)
+│   └── Dockerfile               (multistage build for nextjs-app)
 ├── .yarnrc.yml
-├── .dockerignore
-├── docker-compose.nextjs-app.yml   (compose specific for nextjs-app)
-├── docker-compose.yml           (general services like postgresql...)
-├── Dockerfile                   (multistage build for nextjs-app)
 ├── package.json                 (the workspace config)
 └── tsconfig.base.json           (base typescript config)
 ```
@@ -413,28 +397,27 @@ with resulting semver version and generate CHANGELOGS for you.
 
 Some convenience scripts can be run in any folder of this repo and will call their counterparts defined in packages and apps.
 
-| Name                         | Description                                                                                                                          |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `yarn g:changeset`           | Add a changeset to declare a new version                                                                                             |
-| `yarn g:codegen`             | Run codegen in all workspaces                                                                                                        |
-| `yarn g:typecheck`           | Run typechecks in all workspaces                                                                                                     |
-| `yarn g:lint`                | Display linter issues in all workspaces                                                                                              |
-| `yarn g:lint --fix`          | Attempt to run linter auto-fix in all workspaces                                                                                     |
-| `yarn g:lint-styles`         | Display css stylelint issues in all workspaces                                                                                       |
-| `yarn g:lint-styles --fix`   | Attempt to run stylelint auto-fix issues in all workspaces                                                                           |
-| `yarn g:test`                | Run unit and e2e tests in all workspaces                                                                                             |
-| `yarn g:test-unit`           | Run unit tests in all workspaces                                                                                                     |
-| `yarn g:test-e2e`            | Run e2e tests in all workspaces                                                                                                      |
-| `yarn g:build`               | Run build in all workspaces                                                                                                          |
-| `yarn g:clean`               | Clean builds in all workspaces                                                                                                       |
-| `yarn g:check-dist`          | Ensure build dist files passes es2017 (run `g:build` first).                                                                         |
-| `yarn g:check-size`          | Ensure browser dist files are within size limit (run `g:build` first).                                                               |
-| `yarn clean:global-cache`    | Clean tooling caches (eslint, jest...)                                                                                               |
-| `yarn deps:check --dep dev`  | Will print what packages can be upgraded globally (see also [.ncurc.yml](https://github.com/sortlist/packages/blob/main/.ncurc.yml)) |
-| `yarn deps:update --dep dev` | Apply possible updates (run `yarn install && yarn dedupe` after)                                                                     |
-| `yarn check:install`         | Verify if there's no peer-deps missing in packages                                                                                   |
-| `yarn install:playwright`    | Install playwright for e2e                                                                                                           |
-| `yarn dedupe`                | Built-in yarn deduplication of the lock file                                                                                         |
+| Name                         | Description                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| `yarn g:changeset`           | Add a changeset to declare a new version                                              |
+| `yarn g:codegen`             | Run codegen in all workspaces                                                         |
+| `yarn g:typecheck`           | Run typechecks in all workspaces                                                      |
+| `yarn g:lint`                | Display linter issues in all workspaces                                               |
+| `yarn g:lint --fix`          | Attempt to run linter auto-fix in all workspaces                                      |
+| `yarn g:lint-styles`         | Display css stylelint issues in all workspaces                                        |
+| `yarn g:lint-styles --fix`   | Attempt to run stylelint auto-fix issues in all workspaces                            |
+| `yarn g:test`                | Run unit and e2e tests in all workspaces                                              |
+| `yarn g:test-unit`           | Run unit tests in all workspaces                                                      |
+| `yarn g:test-e2e`            | Run e2e tests in all workspaces                                                       |
+| `yarn g:build`               | Run build in all workspaces                                                           |
+| `yarn g:clean`               | Clean builds in all workspaces                                                        |
+| `yarn g:check-dist`          | Ensure build dist files passes es2017 (run `g:build` first).                          |
+| `yarn g:check-size`          | Ensure browser dist files are within size limit (run `g:build` first).                |
+| `yarn clean:global-cache`    | Clean tooling caches (eslint, jest...)                                                |
+| `yarn deps:check --dep dev`  | Will print what packages can be upgraded globally (see also [.ncurc.yml](.ncurc.yml)) |
+| `yarn deps:update --dep dev` | Apply possible updates (run `yarn install && yarn dedupe` after)                      |
+| `yarn install:playwright`    | Install playwright for e2e                                                            |
+| `yarn dedupe`                | Built-in yarn deduplication of the lock file                                          |
 
 > Why using `:` to prefix scripts names ? It's convenient in yarn 3+, we can call those scripts from any folder in the monorepo.
 > `g:` is a shortcut for `global:`. See the complete list in [root package.json](./package.json).
@@ -470,7 +453,6 @@ Configuration lives in the root folder of each apps/packages. As an
 example see
 
 - [./apps/nextjs-app/vitest.config.ts](./apps/nextjs-app/vitest.config.ts).
-- [./apps/remix-app/jest.config.js](./apps/remix-app/jest.config.js).
 
 ### 5.4 CI
 

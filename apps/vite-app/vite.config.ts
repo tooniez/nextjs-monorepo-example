@@ -15,9 +15,6 @@ export default defineConfig({
     }),
     tsconfigPaths(),
     svgr({
-      // Set it to `true` to export React component as default.
-      // Notice that it will override the default behavior of Vite.
-      exportAsDefault: true,
       // svgr options: https://react-svgr.com/docs/options/
       svgrOptions: {},
     }),
@@ -26,9 +23,6 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     passWithNoTests: true,
-    cache: {
-      dir: '../../.cache/vitest/vite-app',
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'clover'],

@@ -11,29 +11,7 @@
  * See in the future how it evolves
  */
 
-import { isParsableDsn } from '@soluble/dsn-parser';
-import { z } from 'zod';
-import { exitOrThrowError, zConvertTruthyStrToBool } from './utils.mjs';
-
-const dsnSchema = z.custom((dsn) => isParsableDsn(dsn), 'Invalid DSN format.');
-
-export const serverRuntimeEnvSchema = z.object({
-  APP_CACHE_DSN: z.union([dsnSchema, z.literal('')]),
-  PRISMA_DATABASE_URL: dsnSchema,
-
-  // --------------------------------------------------------------------
-  // Authentication related
-  // --------------------------------------------------------------------
-  AUTH_ENABLE_DEMO_ADMIN_USER: zConvertTruthyStrToBool(false),
-
-  NEXTAUTH_URL: z.string().url(),
-  NEXTAUTH_SECRET: z.string().min(15),
-
-  // @todo implement azure AD
-  AZURE_AD_CLIENT_ID: z.string().min(5),
-  AZURE_AD_CLIENT_SECRET: z.string().min(20),
-  AZURE_AD_TENANT_ID: z.string().min(5),
-});
+import { exitOrThrowError } from './utils.mjs';
 
 /**
  * Return a validated / transformed environment object from a zodSchema. This is to be used to tune
