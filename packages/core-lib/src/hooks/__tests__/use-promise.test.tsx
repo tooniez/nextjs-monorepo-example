@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { vi } from 'vitest';
 import { render, screen, act, renderHook, waitFor } from '@/test-utils';
 import { usePromise } from '../use-promise';
 
@@ -8,7 +9,7 @@ describe('usePromise', () => {
       const deps = { slug: 'b' };
       const expected = { value: 'cool' };
       type Deps = typeof deps;
-      const callback = jest.fn();
+      const callback = vi.fn();
       const promiseFn = async (deps: Deps) => {
         callback(deps);
         return expected;
@@ -20,7 +21,7 @@ describe('usePromise', () => {
       // initial data
       const initialValue = result.current;
       expect(result.current.data).toBeNull();
-      expect(result.current.isLoading).toStrictEqual(true);
+      expect(result.current.isLoading).toBe(true);
       expect(result.current.error).toBeNull();
 
       // resolved data
@@ -31,18 +32,19 @@ describe('usePromise', () => {
       expect(callback).toHaveBeenCalledTimes(1);
 
       expect(result.current.data).toStrictEqual(expected);
-      expect(result.current.isLoading).toStrictEqual(false);
+      expect(result.current.isLoading).toBe(false);
       expect(result.current.error).toBeNull();
 
       rerender();
       expect(callback).toHaveBeenCalledTimes(1);
       expect(result.current.data).toStrictEqual(expected);
-      expect(result.current.isLoading).toStrictEqual(false);
+      expect(result.current.isLoading).toBe(false);
       expect(result.current.error).toBeNull();
     });
 
     it('should set error when promise fails', async () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
+      // eslint-disable-next-line @typescript-eslint/require-await
       const promiseFn = async () => {
         callback();
         throw new Error('cool');
@@ -53,7 +55,7 @@ describe('usePromise', () => {
       // initial data
       const initialValue = result.current;
       expect(result.current.data).toBeNull();
-      expect(result.current.isLoading).toStrictEqual(true);
+      expect(result.current.isLoading).toBe(true);
       expect(result.current.error).toBeNull();
 
       // resolved data
@@ -63,21 +65,22 @@ describe('usePromise', () => {
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.isLoading).toStrictEqual(false);
-      expect(result.current.error?.message).toStrictEqual('cool');
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.error?.message).toBe('cool');
     });
 
     it('should call the promise when forceReload is called', async () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       const promiseFn = async () => {
         callback();
+        return 0;
       };
 
       const { result } = renderHook(() => usePromise(promiseFn, {}));
       // initial data
       const initialValue = result.current;
       expect(result.current.data).toBeNull();
-      expect(result.current.isLoading).toStrictEqual(true);
+      expect(result.current.isLoading).toBe(true);
       expect(result.current.error).toBeNull();
 
       // resolved data
@@ -115,7 +118,7 @@ describe('usePromise', () => {
       it('should conditionally call the promise based on deps changes', async () => {
         // Arrange
         const promise = Promise.resolve();
-        const handleLoading = jest.fn(() => promise);
+        const handleLoading = vi.fn(() => promise);
         const loadData = async (deps: Params) => {
           await handleLoading();
           return deps.query;
@@ -147,8 +150,8 @@ describe('usePromise', () => {
       it('should call the promise if changed', async () => {
         // Arrange
         const promise = Promise.resolve();
-        const handleLoading1 = jest.fn(() => promise);
-        const handleLoading2 = jest.fn(() => promise);
+        const handleLoading1 = vi.fn(() => promise);
+        const handleLoading2 = vi.fn(() => promise);
         const loadData1 = async (deps: Params) => {
           await handleLoading1();
           return deps.query;

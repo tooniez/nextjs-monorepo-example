@@ -13,7 +13,6 @@ const isProd = process.env.NODE_ENV === 'production';
 const falseOnCi = !isCI;
 
 /**
- * @todo working with jsdoc/mjs is limited, see later on how to improve this
  * @satisfies { Record<`NEXT_BUILD_ENV_${string}`, import('zod').ZodSchema> }
  */
 const schema = {
@@ -23,22 +22,22 @@ const schema = {
         'For standalone mode: https://nextjs.org/docs/pages/api-reference/next-config-js/output',
     })
     .default('classic'),
-  // https://nextjs.org/docs/advanced-features/source-maps',
-  NEXT_BUILD_ENV_SOURCEMAPS: zConvertTruthyStrToBool(isProd),
   NEXT_BUILD_ENV_TSCONFIG: z
     .string()
     .endsWith('.json')
     .default('tsconfig.json'),
   NEXT_BUILD_ENV_TYPECHECK: zConvertTruthyStrToBool(falseOnCi),
   NEXT_BUILD_ENV_LINT: zConvertTruthyStrToBool(falseOnCi),
+  NEXT_BUILD_ENV_SOURCEMAPS: zConvertTruthyStrToBool(isProd),
   NEXT_BUILD_ENV_CSP: zConvertTruthyStrToBool(true),
   NEXT_BUILD_ENV_CI: zConvertTruthyStrToBool(isCI),
-
+  NEXT_BUILD_ENV_BUILD_ID: z
+    .string()
+    .default(isProd ? new Date().toISOString().replace(':', '_') : ''),
   // --------------------------------------------------------------------
   // Sentry related
   // --------------------------------------------------------------------
-  NEXT_BUILD_ENV_SENTRY_ENABLED: zConvertTruthyStrToBool(true),
-  NEXT_BUILD_ENV_SENTRY_UPLOAD_DRY_RUN: zConvertTruthyStrToBool(true),
+  NEXT_BUILD_ENV_SENTRY_ENABLED: zConvertTruthyStrToBool(false),
   NEXT_BUILD_ENV_SENTRY_DEBUG: zConvertTruthyStrToBool(false),
   NEXT_BUILD_ENV_SENTRY_TRACING: zConvertTruthyStrToBool(false),
 };

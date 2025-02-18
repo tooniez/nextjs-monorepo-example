@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/actions/yarn-nm-install
 
       - name: 🏗 Run codegen
-        run: yarn workspaces foreach -tv run codegen
+        run: yarn workspaces foreach -A -tv run codegen
 
       - name: 🛟 Check if codegen is in sync
         shell: bash

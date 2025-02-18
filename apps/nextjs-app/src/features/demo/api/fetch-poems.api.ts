@@ -1,7 +1,9 @@
-import type { JsonApiResponse } from '@your-org/core-lib/api/json-api';
-import { isJsonApiSuccessResponse } from '@your-org/core-lib/api/json-api';
-import type { SearchPoems } from '@/backend/features/poem/SearchPoems';
+import {
+  isJsonApiSuccessResponse,
+  type JsonApiResponse,
+} from '@httpx/json-api';
 import { apiFetcher } from '@/config/api-fetcher.config';
+import type { SearchPoems } from '@/server/features/poem/SearchPoems';
 
 export const fetchPoems = async (): Promise<SearchPoems> => {
   return apiFetcher<JsonApiResponse<SearchPoems>>('/api/rest/poem').then(

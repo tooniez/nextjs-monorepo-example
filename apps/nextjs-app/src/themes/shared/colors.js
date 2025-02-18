@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const tailwindColors = require('tailwindcss/colors');
 
 /**
@@ -6,7 +7,7 @@ const tailwindColors = require('tailwindcss/colors');
  *     that will log a warning when accessing the object key
  * @type {Record<string, string | Record<string, string>>}
  */
-const tailwindV3Colors = Object.entries(
+export const tailwindV3Colors = Object.entries(
   Object.getOwnPropertyDescriptors(tailwindColors)
 )
   .filter(
@@ -14,6 +15,7 @@ const tailwindV3Colors = Object.entries(
       Object.prototype.hasOwnProperty.call(desc, 'value') &&
       typeof desc.value !== 'function'
   )
+  // eslint-disable-next-line unicorn/no-array-reduce
   .reduce((acc, [key]) => {
     if (
       !['coolGray', 'lightBlue', 'warmGray', 'trueGray', 'blueGray'].includes(

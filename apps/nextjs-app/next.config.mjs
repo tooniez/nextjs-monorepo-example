@@ -3,19 +3,17 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
-import withBundleAnalyzer from '@next/bundle-analyzer';
-import { withSentryConfig } from '@sentry/nextjs'; // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 import { createSecureHeaders } from 'next-secure-headers';
 import pc from 'picocolors';
 import nextI18nConfig from './next-i18next.config.mjs';
 import { buildEnv } from './src/config/build-env.config.mjs';
-import { getServerRuntimeEnv } from './src/config/server-runtime-env.config.mjs';
+// import { getServerRuntimeEnv } from './src/config/server-runtime-env.config.mjs';
 
 // @ts-ignore
 import { PrismaPlugin } from '@prisma/nextjs-monorepo-workaround-plugin';
 
 // validate server env
-const _serverEnv = getServerRuntimeEnv();
+// const _serverEnv = getServerRuntimeEnv();
 
 const workspaceRoot = path.resolve(
   path.dirname(url.fileURLToPath(import.meta.url)),
@@ -29,7 +27,7 @@ const workspaceRoot = path.resolve(
  * @type {import('type-fest').PackageJson}
  */
 const packageJson = JSON.parse(
-  readFileSync(new URL('./package.json', import.meta.url)).toString('utf-8')
+  readFileSync(new URL('package.json', import.meta.url)).toString('utf8')
 );
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -104,8 +102,9 @@ const nextConfig = {
   i18n: nextI18nConfig.i18n,
   optimizeFonts: true,
 
+  // @link https://nextjs.org/docs/pages/api-reference/next-config-js/httpAgentOptions
   httpAgentOptions: {
-    // @link https://nextjs.org/blog/next-11-1#builds--data-fetching
+    // ⚠️ keepAlive might introduce memory-leaks for long-running servers (ie: on docker)
     keepAlive: true,
   },
 
@@ -120,14 +119,6 @@ const nextConfig = {
 
   compiler: {
     // emotion: true,
-  },
-
-  sentry: {
-    hideSourceMaps: true,
-    // To disable the automatic instrumentation of API route handlers and server-side data fetching functions
-    // In other words, disable if you prefer to explicitly handle sentry per api routes (ie: wrapApiHandlerWithSentry)
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#configure-server-side-auto-instrumentation
-    autoInstrumentServerFunctions: false,
   },
 
   // @link https://nextjs.org/docs/basic-features/image-optimization
@@ -159,27 +150,6 @@ const nextConfig = {
       ]
     : [],
 
-  modularizeImports: {
-    '@mui/material': {
-      transform: '@mui/material/{{member}}',
-    },
-    '@mui/icons-material': {
-      transform: '@mui/icons-material/{{member}}',
-    },
-    '@mui/styles': {
-      transform: '@mui/styles/{{member}}',
-    },
-    /* if needed
-    "@mui/lab": {
-      transform: "@mui/lab/{{member}}"
-    },
-    lodash: {
-      transform: 'lodash/{{member}}',
-      preventFullImport: true,
-    },
-    */
-  },
-
   // Standalone build
   // @link https://nextjs.org/docs/advanced-features/output-file-tracing#automatically-copying-traced-files-experimental
   ...(buildEnv.NEXT_BUILD_ENV_OUTPUT === 'standalone'
@@ -191,6 +161,16 @@ const nextConfig = {
     ...(buildEnv.NEXT_BUILD_ENV_OUTPUT === 'standalone'
       ? { outputFileTracingRoot: workspaceRoot }
       : {}),
+
+    // https://github.com/vercel/turbo/issues/4832
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
 
     // Useful in conjunction with to `output: 'standalone'` and `outputFileTracing: true`
     // to keep lambdas sizes / docker images low when vercel/nft isn't able to
@@ -292,21 +272,30 @@ const nextConfig = {
       config.plugins.push(new PrismaPlugin());
     }
 
-    config.module.rules.push({
-      test: /\.svg$/,
-      issuer: /\.(js|ts)x?$/,
-      use: [
-        {
-          loader: '@svgr/webpack',
-          // https://react-svgr.com/docs/webpack/#passing-options
-          options: {
-            svgo: isProd,
-            // @link https://github.com/svg/svgo#configuration
-            // svgoConfig: { }
-          },
-        },
-      ],
-    });
+    // Grab the existing rule that handles SVG imports
+    const fileLoaderRule = config.module.rules.find(
+      (/** @type {{ test: { test: (arg0: string) => any; }; }} */ rule) =>
+        rule.test?.test?.('.svg')
+    );
+
+    config.module.rules.push(
+      // Reapply the existing rule, but only for svg imports ending in ?url
+      {
+        ...fileLoaderRule,
+        test: /\.svg$/i,
+        resourceQuery: /url/, // *.svg?url
+      },
+      // Convert all other *.svg imports to React components
+      {
+        test: /\.svg$/i,
+        issuer: fileLoaderRule.issuer,
+        resourceQuery: { not: [...fileLoaderRule.resourceQuery.not, /url/] }, // exclude if *.svg?url
+        use: ['@svgr/webpack'],
+      }
+    );
+
+    // Modify the file loader rule to ignore *.svg, since we have it handled now.
+    fileLoaderRule.exclude = /\.svg$/i;
 
     return config;
   },
@@ -319,29 +308,44 @@ const nextConfig = {
 
 let config = nextConfig;
 
-if (buildEnv.NEXT_BUILD_ENV_SENTRY_ENABLED === true) {
-  // @ts-ignore cause sentry is not always following nextjs types
-  config = withSentryConfig(config, {
-    // Additional config options for the Sentry Webpack plugin. Keep in mind that
-    // the following options are set automatically, and overriding them is not
-    // recommended:
-    //   release, url, org, project, authToken, configFile, stripPrefix,
-    //   urlPrefix, include, ignore
-    // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options.
-    // silent: isProd, // Suppresses all logs
-    dryRun: buildEnv.NEXT_BUILD_ENV_SENTRY_UPLOAD_DRY_RUN === true,
-    silent: buildEnv.NEXT_BUILD_ENV_SENTRY_DEBUG === false,
-  });
-} else {
-  const { sentry, ...rest } = config;
-  config = rest;
+if (
+  buildEnv.NEXT_BUILD_ENV_SENTRY_ENABLED === true &&
+  process.env.SENTRY_AUTH_TOKEN !== ''
+) {
+  try {
+    // https://docs.sentry.io/platforms/javascript/guides/nextjs/
+    const withSentryConfig = await import('@sentry/nextjs').then(
+      (mod) => mod.withSentryConfig
+    );
+    // @ts-ignore cause sentry is not always following nextjs types
+    config = withSentryConfig(config, {
+      // Additional config options for the Sentry Webpack plugin. Keep in mind that
+      // the following options are set automatically, and overriding them is not
+      // recommended:
+      //   release, url, org, project, authToken, configFile, stripPrefix,
+      //   urlPrefix, include, ignore
+      // For all available options, see:
+      // https://github.com/getsentry/sentry-webpack-plugin#options.
+      // silent: isProd, // Suppresses all logs
+      silent: buildEnv.NEXT_BUILD_ENV_SENTRY_DEBUG === false,
+    });
+    console.log(`- ${pc.green('info')} Sentry enabled for this build`);
+  } catch {
+    console.log(`- ${pc.red('error')} Could not enable sentry, import failed`);
+  }
 }
 
 if (process.env.ANALYZE === 'true') {
-  config = withBundleAnalyzer({
-    enabled: true,
-  })(config);
+  try {
+    const withBundleAnalyzer = await import('@next/bundle-analyzer').then(
+      (mod) => mod.default
+    );
+    config = withBundleAnalyzer({
+      enabled: true,
+    })(config);
+  } catch {
+    // Do nothing, @next/bundle-analyzer is probably purged in prod or not installed
+  }
 }
 
 export default config;

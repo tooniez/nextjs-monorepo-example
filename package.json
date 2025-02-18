@@ -21,74 +21,58 @@
   "homepage": "https://github.com/belgattitude/nextjs-monorepo-example",
   "repository": "belgattitude/nextjs-monorepo-example",
   "scripts": {
-    "apps:build": "yarn workspaces foreach -ptv --include '*-app' run build",
-    "apps:clean": "yarn workspaces foreach -ptv --include '*-app' run clean",
-    "check:install": "yarn dlx @yarnpkg/doctor@3.1.4 .",
     "check:git-pristine": "./scripts/check-git-pristine.sh",
-    "check:renovate:config": "docker run -v renovate.json5:/usr/src/app/renovate.json5 -it renovate/renovate renovate-config-validator",
     "clean:global-cache": "rimraf ./.cache",
-    "clean:turbo": "rimraf --glob '**/.turbo'",
-    "deps:check": "npx npm-check-updates@latest --configFileName ncurc.yml --workspaces --root --mergeConfig",
-    "deps:update": "npx npm-check-updates@latest --configFileName ncurc.yml -u --workspaces --root --mergeConfig",
-    "g:build": "yarn workspaces foreach -p --topological-dev -v run build",
-    "g:build-changed": "yarn workspaces foreach --topological-dev --no-private -v --since=origin/main run build",
+    "clean:turbo": "turbo clean && rimraf --glob '**/.turbo' '**/turbo-*.log'",
+    "deps:check": "npx npm-check-updates@latest --configFileName .ncurc.yml --workspaces --root --mergeConfig",
+    "deps:update": "npx npm-check-updates@latest --configFileName .ncurc.yml -u --workspaces --root --mergeConfig",
+    "g:build": "turbo run build",
     "g:changeset": "changeset",
-    "g:check-dist": "yarn workspaces foreach -ptv run check-dist",
-    "g:clean": "yarn clean:global-cache && rimraf ./out && yarn workspaces foreach -ptv run clean",
-    "g:codegen": "yarn workspaces foreach -ptv run codegen",
-    "g:fix-all-files": "yarn workspaces foreach -ptv run fix-all-files",
-    "g:lint": "yarn workspaces foreach -tv run lint --color",
+    "g:check-dist": "turbo run check-dist",
+    "g:clean": "yarn clean:global-cache && yarn clean:turbo && rimraf ./out && yarn workspaces foreach -A -ptv run clean",
+    "g:codegen": "turbo run codegen",
+    "g:fix-all-files": "turbo run fix-all-files",
+    "g:lint": "TIMING=1 turbo run lint --color",
     "g:lint-staged-files": "lint-staged --allow-empty",
-    "g:lint-styles": "yarn workspaces foreach -ptv run lint-styles --color",
+    "g:lint-styles": "turbo run lint-styles --color",
     "g:release": "yarn g:build && changeset publish",
-    "g:share-static-hardlink": "yarn workspaces foreach -pv --include 'apps/*' run share-static-hardlink",
-    "g:share-static-symlink": "yarn workspaces foreach -pv --include 'apps/*' run share-static-symlink",
-    "g:test-e2e": "yarn workspaces foreach -tv run test-e2e",
-    "g:test-unit": "yarn workspaces foreach -tv run test-unit",
-    "g:test-unit-jest": "yarn workspaces foreach -tv run test-unit-jest",
-    "g:typecheck": "yarn workspaces foreach -tv run typecheck",
+    "g:test-e2e": "turbo run test-e2e",
+    "g:test-unit": "turbo run test-unit",
+    "g:typecheck": "turbo run typecheck",
     "g:turbo": "turbo",
     "install:playwright": "playwright install",
+    "install:husky": "husky",
     "nuke:node_modules": "rimraf --glob '**/node_modules'",
-    "postinstall": "is-ci || yarn husky install"
+    "postinstall": "run-s install:husky g:codegen",
+    "check:install": "yarn dlx @yarnpkg/doctor ."
   },
   "dependencies": {
     "cross-env": "7.0.3"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "0.4.8",
-    "@changesets/cli": "2.26.2",
-    "@commitlint/cli": "17.6.7",
-    "@commitlint/config-conventional": "17.6.7",
-    "@types/prettier": "2.7.3",
-    "@types/shell-quote": "1.7.1",
+    "@changesets/changelog-github": "0.5.1",
+    "@changesets/cli": "2.27.12",
+    "@commitlint/cli": "19.7.1",
+    "@commitlint/config-conventional": "19.7.1",
+    "@types/shell-quote": "1.7.5",
     "@your-org/eslint-config-bases": "workspace:^",
-    "eslint": "8.45.0",
-    "husky": "8.0.3",
-    "is-ci": "3.0.1",
-    "lint-staged": "13.2.3",
-    "npm-run-all": "4.1.5",
-    "prettier": "3.0.0",
-    "rimraf": "5.0.1",
-    "shell-quote": "1.8.1",
-    "syncpack": "10.7.3",
-    "turbo": "1.10.9",
-    "typescript": "5.1.6"
+    "eslint": "8.57.1",
+    "husky": "9.1.7",
+    "lint-staged": "15.4.3",
+    "npm-run-all2": "7.0.2",
+    "prettier": "3.5.1",
+    "rimraf": "6.0.1",
+    "shell-quote": "1.8.2",
+    "syncpack": "13.0.2",
+    "turbo": "2.4.2",
+    "typescript": "5.7.3"
   },
   "engines": {
-    "node": ">=18.12.0",
-    "yarn": ">=1.22.0",
-    "npm": "please-use-yarn"
+    "node": ">=18.18.0"
   },
-  "packageManager": "yarn@4.0.0-rc.48",
+  "packageManager": "yarn@4.6.0",
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "resolutions?": {
-    "eslint-plugin-react-hooks": "https://github.com/vercel/next.js/issues/52365"
-  },
-  "resolutions": {
-    "eslint-plugin-react-hooks": "4.6.0"
-  }
+  ]
 }

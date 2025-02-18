@@ -9,16 +9,8 @@
       "path": "apps/nextjs-app"
     },
     {
-      "name": "🍂 remix-app",
-      "path": "apps/remix-app"
-    },
-    {
       "name": "🍂 vite-app",
       "path": "apps/vite-app"
-    },
-    {
-      "name": "📦 api-gateway",
-      "path": "packages/api-gateway"
     },
     {
       "name": "📦 common-i18n",
@@ -39,7 +31,7 @@
     {
       "name": "📦 ts-utils",
       "path": "packages/ts-utils"
-    }
+    },
     {
       "name": "📦 ui-lib",
       "path": "packages/ui-lib"
@@ -71,7 +63,6 @@
     // https://github.com/Microsoft/vscode-eslint#mono-repository-setup
     "eslint.workingDirectories": [
       "./apps/nextjs-app",
-      "./apps/remix-app",
       "./apps/vite-app",
       "./packages/api-gateway",
       "./packages/common-i18n",
@@ -86,7 +77,6 @@
       "📦 eslint-config-bases",
       "📦 db-main-prisma",
       "📦 common-i18n",
-      "🍂 remix-app",
       "📦 ui-lib",
       "📦 core-lib",
       "🍂 vite-app"
